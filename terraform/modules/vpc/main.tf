@@ -5,7 +5,7 @@ data "aws_availability_zones" "available" {
 data "aws_region" "current" {}
 
 data "aws_prefix_list" "dynamodb" {
-  name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+  name = "com.amazonaws.${data.aws_region.current.region}.dynamodb"
 }
 
 resource "aws_vpc" "this" {
@@ -68,7 +68,7 @@ resource "aws_security_group" "lambda" {
 
 resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id            = aws_vpc.this.id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+  service_name      = "com.amazonaws.${data.aws_region.current.region}.dynamodb"
   vpc_endpoint_type = "Gateway"
   route_table_ids   = aws_route_table.private[*].id
 

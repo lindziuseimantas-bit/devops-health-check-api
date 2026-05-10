@@ -220,6 +220,7 @@ data "aws_iam_policy_document" "deploy" {
       "iam:GetRolePolicy",
       "iam:DeleteRolePolicy",
       "iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies",
       "iam:PassRole"
     ]
 
@@ -255,8 +256,9 @@ data "aws_iam_policy_document" "deploy" {
 
     actions = [
       "dynamodb:CreateTable",
-      "dynamodb:DeleteTable",
       "dynamodb:DescribeTable",
+      "dynamodb:DescribeTimeToLive",
+      "dynamodb:UpdateTable",
       "dynamodb:UpdateTable",
       "dynamodb:TagResource",
       "dynamodb:UntagResource",
@@ -269,13 +271,23 @@ data "aws_iam_policy_document" "deploy" {
   }
 
   statement {
+    sid    = "DescribeCloudWatchLogGroups"
+    effect = "Allow"
+
+    actions = [
+      "logs:DescribeLogGroups"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "ManageEnvironmentCloudWatchLogs"
     effect = "Allow"
 
     actions = [
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
-      "logs:DescribeLogGroups",
       "logs:PutRetentionPolicy",
       "logs:TagResource",
       "logs:UntagResource",
@@ -367,7 +379,8 @@ data "aws_iam_policy_document" "deploy" {
     resources = [
       "arn:aws:apigateway:${var.aws_region}::/restapis*",
       "arn:aws:apigateway:${var.aws_region}::/usageplans*",
-      "arn:aws:apigateway:${var.aws_region}::/apikeys*"
+      "arn:aws:apigateway:${var.aws_region}::/apikeys*",
+      "arn:aws:apigateway:${var.aws_region}::/tags/*"
     ]
   }
 }
