@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "kms" {
     condition {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:logs:arn"
-      values   = [
+      values = [
         "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/lambda/${var.env}-health-check-function",
         "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/lambda/${var.env}-health-check-function:*"
       ]

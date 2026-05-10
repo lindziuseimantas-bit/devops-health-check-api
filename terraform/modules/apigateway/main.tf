@@ -23,11 +23,11 @@ resource "aws_api_gateway_model" "health_request" {
   content_type = "application/json"
 
   schema = jsonencode({
-    "$schema"             = "http://json-schema.org/draft-04/schema#"
-    title                 = "HealthCheckRequest"
-    type                  = "object"
-    required              = ["payload"]
-    additionalProperties  = true
+    "$schema"            = "http://json-schema.org/draft-04/schema#"
+    title                = "HealthCheckRequest"
+    type                 = "object"
+    required             = ["payload"]
+    additionalProperties = true
     properties = {
       payload = {}
     }
