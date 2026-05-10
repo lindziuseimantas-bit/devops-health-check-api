@@ -4,6 +4,10 @@ data "aws_availability_zones" "available" {
 
 data "aws_region" "current" {}
 
+data "aws_prefix_list" "dynamodb" {
+  name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+}
+
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -50,11 +54,11 @@ resource "aws_security_group" "lambda" {
   vpc_id      = aws_vpc.this.id
 
   egress {
-    description = "Allow HTTPS egress to AWS service endpoints"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Allow HTTPS egress only to DynamoDB service prefix list"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_prefix_list.dynamodb.id]
   }
 
   tags = {
