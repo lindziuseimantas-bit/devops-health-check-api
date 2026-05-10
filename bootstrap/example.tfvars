@@ -1,0 +1,5 @@
+aws_region            = "eu-central-1"
+github_owner          = "REPLACE_WITH_GITHUB_OWNER"
+github_repo           = "devops-health-check-api"
+state_bucket_name     = "REPLACE_WITH_GLOBALLY_UNIQUE_TF_STATE_BUCKET"
+state_lock_table_name = "health-check-terraform-locks"
