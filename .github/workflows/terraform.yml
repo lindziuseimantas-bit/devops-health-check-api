@@ -73,7 +73,7 @@ jobs:
         run: terraform validate
 
       - name: Scan Terraform for misconfigurations
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: config
           scan-ref: terraform
