@@ -289,6 +289,7 @@ data "aws_iam_policy_document" "deploy" {
       "logs:CreateLogGroup",
       "logs:DeleteLogGroup",
       "logs:PutRetentionPolicy",
+      "logs:ListTagsForResource",
       "logs:TagResource",
       "logs:UntagResource",
       "logs:AssociateKmsKey",
