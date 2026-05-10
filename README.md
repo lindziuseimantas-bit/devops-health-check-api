@@ -2,7 +2,7 @@
 
 ## Submission
 
-Public GitHub repository URL: `https://github.com/lindziuseimantas-bit/devops-health-check-api`
+Public GitHub repository URL: `https://github.com/REPLACE_WITH_OWNER/devops-health-check-api`
 
 Replace the placeholder above with the final public repository URL before submitting the homework form.
 
@@ -59,11 +59,11 @@ DynamoDB requests table encrypted with customer-managed KMS key
 
 Install locally if you want to run Terraform outside GitHub Actions:
 
-* Terraform `>= 1.6.0`
-* AWS CLI v2
-* Python 3.12 for local Lambda checks
-* An AWS account with permissions to create the bootstrap resources
-* A public GitHub repository containing this code
+- Terraform `>= 1.6.0`
+- AWS CLI v2
+- Python 3.12 for local Lambda checks
+- An AWS account with permissions to create the bootstrap resources
+- A public GitHub repository containing this code
 
 ## Required GitHub configuration
 
@@ -71,18 +71,18 @@ The workflow uses GitHub OIDC instead of long-lived AWS access keys.
 
 Create GitHub environments named:
 
-* `staging`
-* `prod`
+- `staging`
+- `prod`
 
 Add the following repository or environment variables in GitHub:
 
-|Variable|Scope|Example|Purpose|
-|-|-|-|-|
-|`AWS\_REGION`|repository or each environment|`eu-central-1`|AWS region used by the workflow|
-|`TF\_STATE\_BUCKET`|repository or each environment|`my-unique-health-check-tf-state`|S3 bucket for Terraform state|
-|`TF\_STATE\_LOCK\_TABLE`|repository or each environment|`health-check-terraform-locks`|DynamoDB table for Terraform locking|
-|`TF\_STATE\_KMS\_KEY\_ID`|repository or each environment|`abcd-1234...`|KMS key ID for state encryption|
-|`AWS\_DEPLOY\_ROLE\_ARN`|each environment|`arn:aws:iam::<account-id>:role/staging-health-check-deployment-role`|OIDC role assumed by GitHub Actions|
+| Variable | Scope | Example | Purpose |
+| --- | --- | --- | --- |
+| `AWS_REGION` | repository or each environment | `eu-central-1` | AWS region used by the workflow |
+| `TF_STATE_BUCKET` | repository or each environment | `my-unique-health-check-tf-state` | S3 bucket for Terraform state |
+| `TF_STATE_LOCK_TABLE` | repository or each environment | `health-check-terraform-locks` | DynamoDB table for Terraform locking |
+| `TF_STATE_KMS_KEY_ID` | repository or each environment | `abcd-1234...` | KMS key ID for state encryption |
+| `AWS_DEPLOY_ROLE_ARN` | each environment | `arn:aws:iam::<account-id>:role/staging-health-check-deployment-role` | OIDC role assumed by GitHub Actions |
 
 Recommended production protection:
 
@@ -94,10 +94,10 @@ Recommended production protection:
 
 The `bootstrap/` Terraform creates:
 
-* encrypted S3 bucket for Terraform remote state
-* encrypted DynamoDB table for Terraform state locking
-* GitHub OIDC provider
-* dedicated deployment IAM roles for `staging` and `prod`
+- encrypted S3 bucket for Terraform remote state
+- encrypted DynamoDB table for Terraform state locking
+- GitHub OIDC provider
+- dedicated deployment IAM roles for `staging` and `prod`
 
 Create a bootstrap tfvars file:
 
@@ -108,11 +108,11 @@ cp bootstrap/example.tfvars bootstrap/local.tfvars
 Edit `bootstrap/local.tfvars`:
 
 ```hcl
-aws\_region            = "eu-central-1"
-github\_owner          = "YOUR\_GITHUB\_OWNER"
-github\_repo           = "devops-health-check-api"
-state\_bucket\_name     = "YOUR\_GLOBALLY\_UNIQUE\_STATE\_BUCKET"
-state\_lock\_table\_name = "health-check-terraform-locks"
+aws_region            = "eu-central-1"
+github_owner          = "YOUR_GITHUB_OWNER"
+github_repo           = "devops-health-check-api"
+state_bucket_name     = "YOUR_GLOBALLY_UNIQUE_STATE_BUCKET"
+state_lock_table_name = "health-check-terraform-locks"
 ```
 
 Apply bootstrap once from an admin workstation:
@@ -161,13 +161,13 @@ Application Terraform uses per-environment tfvars files:
 ```bash
 cd terraform
 mkdir -p .build
-terraform init \\
-  -backend-config="bucket=$TF\_STATE\_BUCKET" \\
-  -backend-config="key=health-check/staging/terraform.tfstate" \\
-  -backend-config="region=eu-central-1" \\
-  -backend-config="dynamodb\_table=$TF\_STATE\_LOCK\_TABLE" \\
-  -backend-config="encrypt=true" \\
-  -backend-config="kms\_key\_id=$TF\_STATE\_KMS\_KEY\_ID"
+terraform init \
+  -backend-config="bucket=$TF_STATE_BUCKET" \
+  -backend-config="key=health-check/staging/terraform.tfstate" \
+  -backend-config="region=eu-central-1" \
+  -backend-config="use_lockfile=true" \
+  -backend-config="encrypt=true" \
+  -backend-config="kms_key_id=$TF_STATE_KMS_KEY_ID"
 
 terraform plan -var-file="environments/staging.tfvars"
 terraform apply -var-file="environments/staging.tfvars"
@@ -179,34 +179,34 @@ After deployment, get the endpoint URL:
 
 ```bash
 cd terraform
-terraform output -raw health\_endpoint\_url
+terraform output -raw health_endpoint_url
 ```
 
 Get the API key ID:
 
 ```bash
-terraform output -raw api\_key\_id
+terraform output -raw api_key_id
 ```
 
 Retrieve the API key value:
 
 ```bash
-aws apigateway get-api-key \\
-  --api-key "$(terraform output -raw api\_key\_id)" \\
-  --include-value \\
-  --query value \\
+aws apigateway get-api-key \
+  --api-key "$(terraform output -raw api_key_id)" \
+  --include-value \
+  --query value \
   --output text
 ```
 
 Call the API:
 
 ```bash
-API\_URL="$(terraform output -raw health\_endpoint\_url)"
-API\_KEY="REPLACE\_WITH\_API\_KEY\_VALUE"
+API_URL="$(terraform output -raw health_endpoint_url)"
+API_KEY="REPLACE_WITH_API_KEY_VALUE"
 
-curl -i -X POST "$API\_URL" \\
-  -H "Content-Type: application/json" \\
-  -H "x-api-key: $API\_KEY" \\
+curl -i -X POST "$API_URL" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $API_KEY" \
   -d '{"payload":{"source":"manual-test","message":"hello"}}'
 ```
 
@@ -219,9 +219,9 @@ Expected success response:
 Invalid request example:
 
 ```bash
-curl -i -X POST "$API\_URL" \\
-  -H "Content-Type: application/json" \\
-  -H "x-api-key: $API\_KEY" \\
+curl -i -X POST "$API_URL" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $API_KEY" \
   -d '{"missing":"payload"}'
 ```
 
@@ -235,11 +235,11 @@ The workflow has two jobs.
 
 Runs on pull requests, pushes to `main`, and manual dispatches:
 
-* `terraform fmt -check -recursive`
-* `terraform init -backend=false`
-* `terraform validate`
-* Trivy IaC security scan against the Terraform code
-* `pip-audit` dependency scan for `lambda/requirements.txt`
+- `terraform fmt -check -recursive`
+- `terraform init -backend=false`
+- `terraform validate`
+- Trivy IaC security scan against the Terraform code
+- `pip-audit` dependency scan for `lambda/requirements.txt`
 
 The security scan runs before Terraform apply.
 
@@ -247,43 +247,43 @@ The security scan runs before Terraform apply.
 
 Runs on pushes to `main` and manual dispatches, but not pull requests:
 
-* assumes the environment-specific AWS deployment role using GitHub OIDC
-* initializes Terraform remote state in S3
-* creates the Lambda deployment ZIP with Terraform's `archive\_file` provider
-* runs `terraform plan`
-* runs `terraform apply` when `APPLY=true`
-* prints Terraform outputs after apply
+- assumes the environment-specific AWS deployment role using GitHub OIDC
+- initializes Terraform remote state in S3
+- creates the Lambda deployment ZIP with Terraform's `archive_file` provider
+- runs `terraform plan`
+- runs `terraform apply` when `APPLY=true`
+- prints Terraform outputs after apply
 
 ## Security controls implemented
 
-|Requirement|Implementation|
-|-|-|
-|DynamoDB SSE|DynamoDB table uses `server\_side\_encryption` with a customer-managed KMS key|
-|IaC security scanning|Trivy config scan runs before apply|
-|Lambda dependency scanning|`pip-audit` scans `lambda/requirements.txt`|
-|Least privilege Lambda role|Lambda role can only write to the specific table, write to its log group, decrypt its KMS key, and manage VPC ENIs required by Lambda VPC execution|
-|Dedicated deployment role|Bootstrap creates one GitHub OIDC deployment role per environment|
-|No long-lived AWS secrets|GitHub Actions uses OIDC and `aws-actions/configure-aws-credentials`|
-|API throttling|API Gateway usage plan and method settings set rate and burst limits|
-|API key auth|API Gateway requires `x-api-key` for `/health`|
-|Input validation in Lambda|Lambda returns `400` when the JSON body is invalid or lacks `payload`|
-|API Gateway request validation|REST API model validates that JSON requests include `payload` before invoking Lambda|
-|Lambda VPC|Lambda runs in private subnets with a DynamoDB gateway VPC endpoint|
-|KMS CMK|Customer-managed KMS key encrypts DynamoDB, Lambda environment variables, and Lambda log group|
+| Requirement | Implementation |
+| --- | --- |
+| DynamoDB SSE | DynamoDB table uses `server_side_encryption` with a customer-managed KMS key |
+| IaC security scanning | Trivy config scan runs before apply |
+| Lambda dependency scanning | `pip-audit` scans `lambda/requirements.txt` |
+| Least privilege Lambda role | Lambda role can only write to the specific table, write to its log group, decrypt its KMS key, and manage VPC ENIs required by Lambda VPC execution |
+| Dedicated deployment role | Bootstrap creates one GitHub OIDC deployment role per environment |
+| No long-lived AWS secrets | GitHub Actions uses OIDC and `aws-actions/configure-aws-credentials` |
+| API throttling | API Gateway usage plan and method settings set rate and burst limits |
+| API key auth | API Gateway requires `x-api-key` for `/health` |
+| Input validation in Lambda | Lambda returns `400` when the JSON body is invalid or lacks `payload` |
+| API Gateway request validation | REST API model validates that JSON requests include `payload` before invoking Lambda |
+| Lambda VPC | Lambda runs in private subnets with a DynamoDB gateway VPC endpoint |
+| KMS CMK | Customer-managed KMS key encrypts DynamoDB, Lambda environment variables, and Lambda log group |
 
 ## IAM wildcard note
 
-The Lambda execution policy uses `Resource: "\*"` only for EC2 network-interface operations required for Lambda VPC execution, because those EC2 actions do not support strict resource-level scoping in the way needed by Lambda. KMS key policies also use `Resource: "\*"` as required by KMS key policy semantics. The deployment role similarly uses broader resource scopes only where AWS create/list APIs do not support narrower ARNs reliably; otherwise it scopes by environment-specific resource names such as `staging-health-check-\*` and `prod-health-check-\*`.
+The Lambda execution policy uses `Resource: "*"` only for EC2 network-interface operations required for Lambda VPC execution, because those EC2 actions do not support strict resource-level scoping in the way needed by Lambda. KMS key policies also use `Resource: "*"` as required by KMS key policy semantics. The deployment role similarly uses broader resource scopes only where AWS create/list APIs do not support narrower ARNs reliably; otherwise it scopes by environment-specific resource names such as `staging-health-check-*` and `prod-health-check-*`.
 
 ## Design choices and assumptions
 
-* API Gateway REST API was selected instead of HTTP API because REST API supports request validators, API keys, and usage plans.
-* Both `GET` and `POST` methods are created for `/health`. The intended test command uses `POST` because the security requirement mandates a JSON body containing `payload`.
-* Terraform modules are split by concern: KMS, VPC, DynamoDB, Lambda, and API Gateway.
-* The deployment role is bootstrapped separately because GitHub Actions needs an AWS role before it can deploy the application stack.
-* DynamoDB uses on-demand billing to avoid capacity planning for this exercise.
-* Lambda reserved concurrency is set to `10` to add another blast-radius limit behind API Gateway throttling.
-* No NAT gateway is created. The Lambda reaches DynamoDB through a DynamoDB gateway VPC endpoint.
+- API Gateway REST API was selected instead of HTTP API because REST API supports request validators, API keys, and usage plans.
+- Both `GET` and `POST` methods are created for `/health`. The intended test command uses `POST` because the security requirement mandates a JSON body containing `payload`.
+- Terraform modules are split by concern: KMS, VPC, DynamoDB, Lambda, and API Gateway.
+- The deployment role is bootstrapped separately because GitHub Actions needs an AWS role before it can deploy the application stack.
+- DynamoDB uses on-demand billing to avoid capacity planning for this exercise.
+- Lambda reserved concurrency is set to `10` to add another blast-radius limit behind API Gateway throttling.
+- No NAT gateway is created. The Lambda reaches DynamoDB through a DynamoDB gateway VPC endpoint.
 
 ## Suggested atomic commit history
 
@@ -308,4 +308,3 @@ terraform destroy -var-file="environments/staging.tfvars"
 ```
 
 Destroy bootstrap resources only after all environment state has been destroyed and the state bucket is empty.
-

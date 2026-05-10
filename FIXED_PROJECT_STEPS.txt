@@ -1,0 +1,55 @@
+FIXED PROJECT STEPS
+
+Repository:
+https://github.com/lindziuseimantas-bit/devops-health-check-api
+
+AWS account:
+329599652911
+
+AWS region:
+eu-central-1
+
+GitHub repository variables:
+AWS_REGION=eu-central-1
+TF_STATE_BUCKET=lindziuseimantas-bit-health-tfstate-329599652911
+TF_STATE_KMS_KEY_ID=b2a2a683-e666-40a3-8f8c-a01c98cf5d3d
+
+GitHub environment variable for staging:
+AWS_DEPLOY_ROLE_ARN=arn:aws:iam::329599652911:role/staging-health-check-deployment-role
+
+GitHub environment variable for prod:
+AWS_DEPLOY_ROLE_ARN=arn:aws:iam::329599652911:role/prod-health-check-deployment-role
+
+Windows commands after replacing files:
+cd C:\Users\PCC\Downloads\devops-health-check-api\devops-health-check-api
+terraform fmt -recursive
+git add .
+git commit -m "fix: rebuild warning-free deployment project"
+git push origin main
+
+AWS CloudShell commands after push:
+cd ~/devops-health-check-api
+git pull
+cd bootstrap
+export PATH="$HOME/bin:$PATH"
+rm -rf /tmp/tfdata-bootstrap
+mkdir -p /tmp/tfdata-bootstrap
+export TF_DATA_DIR=/tmp/tfdata-bootstrap
+terraform init
+terraform apply -var-file="local.tfvars"
+
+When Terraform asks for approval, type exactly:
+yes
+
+AWS CloudShell cleanup commands before rerunning staging deploy:
+aws lambda delete-function --function-name staging-health-check-function --region eu-central-1 2>/dev/null || true
+aws logs delete-log-group --log-group-name /aws/lambda/staging-health-check-function --region eu-central-1 2>/dev/null || true
+aws dynamodb delete-table --table-name staging-requests-db --region eu-central-1 2>/dev/null || true
+aws iam delete-role-policy --role-name staging-health-check-lambda-role --policy-name staging-health-check-lambda-policy 2>/dev/null || true
+aws iam delete-role --role-name staging-health-check-lambda-role 2>/dev/null || true
+aws dynamodb wait table-not-exists --table-name staging-requests-db --region eu-central-1 2>/dev/null || true
+
+GitHub deploy:
+Actions -> serverless-health-check-ci-cd -> Run workflow
+environment=staging
+apply=true

@@ -1,5 +1,4 @@
 data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
 
 locals {
   account_id = data.aws_caller_identity.current.account_id
@@ -221,6 +220,7 @@ data "aws_iam_policy_document" "deploy" {
       "iam:DeleteRolePolicy",
       "iam:ListRolePolicies",
       "iam:ListAttachedRolePolicies",
+      "iam:ListInstanceProfilesForRole",
       "iam:PassRole"
     ]
 
@@ -237,14 +237,14 @@ data "aws_iam_policy_document" "deploy" {
       "lambda:UpdateFunctionConfiguration",
       "lambda:GetFunction",
       "lambda:GetFunctionConfiguration",
+      "lambda:GetFunctionCodeSigningConfig",
       "lambda:DeleteFunction",
       "lambda:AddPermission",
       "lambda:RemovePermission",
       "lambda:GetPolicy",
+      "lambda:ListTags",
       "lambda:TagResource",
-      "lambda:UntagResource",
-      "lambda:PutFunctionConcurrency",
-      "lambda:DeleteFunctionConcurrency"
+      "lambda:UntagResource"
     ]
 
     resources = ["arn:aws:lambda:${var.aws_region}:${local.account_id}:function:${each.key}-health-check-*"]
@@ -256,9 +256,9 @@ data "aws_iam_policy_document" "deploy" {
 
     actions = [
       "dynamodb:CreateTable",
+      "dynamodb:DeleteTable",
       "dynamodb:DescribeTable",
       "dynamodb:DescribeTimeToLive",
-      "dynamodb:UpdateTable",
       "dynamodb:UpdateTable",
       "dynamodb:TagResource",
       "dynamodb:UntagResource",
@@ -358,6 +358,7 @@ data "aws_iam_policy_document" "deploy" {
       "ec2:DescribeNetworkInterfaces",
       "ec2:DescribeAvailabilityZones",
       "ec2:DescribePrefixLists",
+      "ec2:DescribeTags",
       "ec2:CreateTags",
       "ec2:DeleteTags"
     ]
