@@ -238,6 +238,8 @@ data "aws_iam_policy_document" "deploy" {
       "lambda:GetFunction",
       "lambda:GetFunctionConfiguration",
       "lambda:GetFunctionCodeSigningConfig",
+      "lambda:GetRuntimeManagementConfig",
+      "lambda:ListVersionsByFunction",
       "lambda:DeleteFunction",
       "lambda:AddPermission",
       "lambda:RemovePermission",
